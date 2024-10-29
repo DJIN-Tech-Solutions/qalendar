@@ -1,96 +1,54 @@
 <template>
   <div class="calendar-month">
-    <div
-      class="calendar-month__week-day-names"
-    >
-      <WeekDay
-        v-for="(day, dayIndex) in month[0]"
-        :key="dayIndex"
-        class="calendar-month__week-day-name"
-        :config="config"
-        :day="day"
-        :time="time"
-      />
+    <div class="calendar-month__week-day-names">
+      <WeekDay v-for="(day, dayIndex) in month[0]" :key="dayIndex" class="calendar-month__week-day-name"
+        :config="config" :day="day" :time="time" />
     </div>
     <div class="calendar-month__weeks">
-      <div
-        v-for="(week, weekIndex) in month"
-        :key="weekIndex"
-        class="calendar-month__week"
-      >
-        <Day
-          v-for="(day, dayIndex) in week"
-          :key="dayIndex"
-          :config="config"
-          :day="day"
-          :time="time"
-          :is-selected="selectedDay?.dateTimeString === day.dateTimeString"
-          @event-was-clicked="handleClickOnEvent"
-          @event-was-dragged="handleEventWasDragged"
-          @date-was-clicked="$emit('date-was-clicked', $event)"
-          @day-was-selected="selectedDay = $event"
-          @updated-period="$emit('updated-period', $event)"
-        >
+      <div v-for="(week, weekIndex) in month" :key="weekIndex" class="calendar-month__week">
+        <Day v-for="(day, dayIndex) in week" :key="dayIndex" :config="config" :day="day" :time="time"
+          :is-selected="selectedDay?.dateTimeString === day.dateTimeString" @event-was-clicked="handleClickOnEvent"
+          @event-was-dragged="handleEventWasDragged" @date-was-clicked="$emit('date-was-clicked', $event)"
+          @day-was-selected="selectedDay = $event" @updated-period="$emit('updated-period', $event)">
           <template #monthEvent="{ eventData }">
-            <slot
-              :event-data="eventData"
-              name="monthEvent"
-            />
+            <slot :event-data="eventData" name="monthEvent" />
           </template>
 
-          <template #dayCell="{dayData}">
-            <slot
-              :day-data="dayData"
-              name="dayCell"
-            />
+          <template #dayCell="{ dayData }">
+            <slot :day-data="dayData" name="dayCell" />
           </template>
         </Day>
       </div>
     </div>
 
-    <div
-      v-if="!(config.month?.showEventsOnMobileView === false)"
-      class="calendar-month__day_events"
-    >
-      <AgendaEvents
-        v-if="selectedDay"
-        :config="config"
-        :time="time"
-        :day="selectedDay"
-        @event-was-clicked="handleClickOnEvent"
-      />
+    <div v-if="!(config.month?.showEventsOnMobileView === false)" class="calendar-month__day_events">
+      <AgendaEvents v-if="selectedDay && !$props.hideAgenda" :config="config" :time="time" :day="selectedDay"
+        @event-was-clicked="handleClickOnEvent">
+        <template #agendaEvents="{ events }">
+          <slot name="agendaEvents" :events="events" />
+        </template>
+      </AgendaEvents>
     </div>
 
-    <EventFlyout
-      v-if="!config.eventDialog || !config.eventDialog.isDisabled"
-      :calendar-event-prop="selectedEvent"
-      :event-element="selectedEventElement"
-      :time="time"
-      :config="config"
-      @hide="selectedEvent = null"
-      @edit-event="$emit('edit-event', $event)"
-      @delete-event="$emit('delete-event', $event)"
-    >
+    <EventFlyout v-if="!config.eventDialog || !config.eventDialog.isDisabled" :calendar-event-prop="selectedEvent"
+      :event-element="selectedEventElement" :time="time" :config="config" @hide="selectedEvent = null"
+      @edit-event="$emit('edit-event', $event)" @delete-event="$emit('delete-event', $event)">
       <template #default="p">
-        <slot
-          name="eventDialog"
-          :event-dialog-data="p.eventDialogData"
-          :close-event-dialog="p.closeEventDialog"
-        />
+        <slot name="eventDialog" :event-dialog-data="p.eventDialogData" :close-event-dialog="p.closeEventDialog" />
       </template>
     </EventFlyout>
   </div>
 </template>
 
 <script lang="ts">
-import {defineComponent, type PropType} from 'vue';
+import { defineComponent, type PropType } from 'vue';
 import Day from './Day.vue';
 import Time from '../../helpers/Time';
-import {type periodInterface} from '../../typings/interfaces/period.interface';
-import {type configInterface} from '../../typings/config.interface';
-import {EVENT_TYPE, type eventInterface} from '../../typings/interfaces/event.interface';
+import { type periodInterface } from '../../typings/interfaces/period.interface';
+import { type configInterface } from '../../typings/config.interface';
+import { EVENT_TYPE, type eventInterface } from '../../typings/interfaces/event.interface';
 import EDate from '../../helpers/EDate';
-import {type dayInterface} from '../../typings/interfaces/day.interface';
+import { type dayInterface } from '../../typings/interfaces/day.interface';
 import EventFlyout from '../partials/EventFlyout.vue';
 import EventPosition from '../../helpers/EventPosition';
 import PerfectScrollbar from 'perfect-scrollbar';
@@ -108,7 +66,7 @@ export default defineComponent({
     Day,
     EventFlyout,
     WeekDay,
-},
+  },
 
   props: {
     config: {
@@ -126,6 +84,10 @@ export default defineComponent({
     eventsProp: {
       type: Array as PropType<eventInterface[]>,
       default: () => [],
+    },
+    hideAgenda: {
+      type: Boolean,
+      default: false,
     },
   },
 

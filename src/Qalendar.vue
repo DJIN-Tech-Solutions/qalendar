@@ -1,64 +1,33 @@
 <template>
   <div class="calendar-root-wrapper">
-    <div
-      class="calendar-root"
-      :class="{
-        'mode-is-day': mode === 'day',
-        'mode-is-week': mode === 'week',
-        'mode-is-month': mode === 'month',
-        'qalendar-is-small': isSmall,
-      }"
-      :data-lang="config?.locale?.substring(0, 2) || 'en'"
-    >
+    <div class="calendar-root" :class="{
+      'mode-is-day': mode === 'day',
+      'mode-is-week': mode === 'week',
+      'mode-is-month': mode === 'month',
+      'qalendar-is-small': isSmall,
+    }" :data-lang="config?.locale?.substring(0, 2) || 'en'">
       <Transition name="loading">
-        <div
-          v-if="isLoading"
-          class="top-bar-loader"
-        />
+        <div v-if="isLoading" class="top-bar-loader" />
       </Transition>
 
-      <AppHeader
-        ref="appHeader"
-        :key="wasInitialized + mode"
-        :config="config"
-        :mode="mode"
-        :time="time"
-        :period="period"
-        :is-small="isSmall"
-        @change-mode="handleChangeMode"
-        @updated-period="handleUpdatedPeriod"
-      />
+      <AppHeader ref="appHeader" :key="wasInitialized + mode" :config="config" :mode="mode" :time="time"
+        :period="period" :is-small="isSmall" @change-mode="handleChangeMode" @updated-period="handleUpdatedPeriod" />
 
-      <Week
-        v-if="['week', 'day'].includes(mode)"
-        :key="period.start.getTime() + period.end.getTime() + eventRenderingKey"
-        :events-prop="eventsDataProperty"
-        :period="period"
-        :config="config"
-        :mode-prop="mode"
-        :time="time"
+      <Week v-if="['week', 'day'].includes(mode)"
+        :key="period.start.getTime() + period.end.getTime() + eventRenderingKey" :events-prop="eventsDataProperty"
+        :period="period" :config="config" :mode-prop="mode" :time="time"
         @event-was-clicked="$emit('event-was-clicked', $event)"
         @event-was-resized="handleEventWasUpdated($event, 'resized')"
-        @event-was-dragged="handleEventWasUpdated($event, 'dragged')"
-        @edit-event="$emit('edit-event', $event)"
-        @delete-event="$emit('delete-event', $event)"
-        @interval-was-clicked="$emit('interval-was-clicked', $event)"
+        @event-was-dragged="handleEventWasUpdated($event, 'dragged')" @edit-event="$emit('edit-event', $event)"
+        @delete-event="$emit('delete-event', $event)" @interval-was-clicked="$emit('interval-was-clicked', $event)"
         @day-was-clicked="$emit('day-was-clicked', $event)"
-        @datetime-was-clicked="$emit('datetime-was-clicked', $event)"
-      >
+        @datetime-was-clicked="$emit('datetime-was-clicked', $event)">
         <template #weekDayEvent="p">
-          <slot
-            :event-data="p.eventData"
-            name="weekDayEvent"
-          />
+          <slot :event-data="p.eventData" name="weekDayEvent" />
         </template>
 
         <template #eventDialog="p">
-          <slot
-            name="eventDialog"
-            :event-dialog-data="p.eventDialogData"
-            :close-event-dialog="p.closeEventDialog"
-          />
+          <slot name="eventDialog" :event-dialog-data="p.eventDialogData" :close-event-dialog="p.closeEventDialog" />
         </template>
 
         <template #customCurrentTime>
@@ -66,40 +35,26 @@
         </template>
       </Week>
 
-      <Month
-        v-if="mode === 'month'"
-        :key="period.start.getTime() + period.end.getTime() + eventRenderingKey"
-        :events-prop="eventsDataProperty"
-        :time="time"
-        :config="enhancedConfig"
-        :period="period"
-        @event-was-clicked="$emit('event-was-clicked', $event)"
-        @date-was-clicked="handleDateWasClicked"
-        @event-was-dragged="handleEventWasUpdated($event, 'dragged')"
-        @updated-period="handleUpdatedPeriod($event, true)"
-        @edit-event="$emit('edit-event', $event)"
-        @delete-event="$emit('delete-event', $event)"
-      >
+      <Month v-if="mode === 'month'" :key="period.start.getTime() + period.end.getTime() + eventRenderingKey"
+        :events-prop="eventsDataProperty" :time="time" :config="enhancedConfig" :period="period"
+        :hide-agenda="hideAgenda" @event-was-clicked="$emit('event-was-clicked', $event)"
+        @date-was-clicked="handleDateWasClicked" @event-was-dragged="handleEventWasUpdated($event, 'dragged')"
+        @updated-period="handleUpdatedPeriod($event, true)" @edit-event="$emit('edit-event', $event)"
+        @delete-event="$emit('delete-event', $event)">
+        <template #agendaEvents="{ events }">
+          <slot name="agendaEvents" :events="events" />
+        </template>
+
         <template #eventDialog="p">
-          <slot
-            name="eventDialog"
-            :event-dialog-data="p.eventDialogData"
-            :close-event-dialog="p.closeEventDialog"
-          />
+          <slot name="eventDialog" :event-dialog-data="p.eventDialogData" :close-event-dialog="p.closeEventDialog" />
         </template>
 
         <template #monthEvent="p">
-          <slot
-            :event-data="p.eventData"
-            name="monthEvent"
-          />
+          <slot :event-data="p.eventData" name="monthEvent" />
         </template>
 
-        <template #dayCell="{dayData}">
-          <slot
-            :day-data="dayData"
-            name="dayCell"
-          />
+        <template #dayCell="{ dayData }">
+          <slot :day-data="dayData" name="dayCell" />
         </template>
       </Month>
     </div>
@@ -107,13 +62,13 @@
 </template>
 
 <script lang="ts">
-import {defineComponent, type PropType} from 'vue';
-import {type eventInterface} from './typings/interfaces/event.interface';
-import {type configInterface} from './typings/config.interface';
+import { defineComponent, type PropType } from 'vue';
+import { type eventInterface } from './typings/interfaces/event.interface';
+import { type configInterface } from './typings/config.interface';
 import Time from './helpers/Time';
 import AppHeader from './components/header/Header.vue';
 import Week from './components/week/Week.vue';
-import {type modeType} from './typings/types';
+import { type modeType } from './typings/types';
 import Month from './components/month/Month.vue';
 import Errors from './helpers/Errors';
 
@@ -140,6 +95,10 @@ export default defineComponent({
       default: new Date(),
     },
     isLoading: {
+      type: Boolean,
+      default: false,
+    },
+    hideAgenda: {
       type: Boolean,
       default: false,
     },
@@ -184,7 +143,7 @@ export default defineComponent({
       ErrorsHelper: Errors,
     };
   },
-  computed:{
+  computed: {
     enhancedConfig(): configInterface {
       return { ...this.config, isSmall: this.isSmall }
     }
@@ -393,12 +352,10 @@ export default defineComponent({
       top: 1px;
       left: 2px;
       background: rgb(38, 132, 255);
-      background: linear-gradient(
-        90deg,
-        rgba(38, 132, 255, 1) 0%,
-        rgba(38, 132, 255, 0.5088410364145659) 48%,
-        rgba(38, 132, 255, 1) 100%
-      );
+      background: linear-gradient(90deg,
+          rgba(38, 132, 255, 1) 0%,
+          rgba(38, 132, 255, 0.5088410364145659) 48%,
+          rgba(38, 132, 255, 1) 100%);
       animation: load 1.8s infinite;
       border-radius: 16px;
 
@@ -412,10 +369,12 @@ export default defineComponent({
         width: 0;
         left: -100%;
       }
+
       50% {
         left: 0;
         width: 100%;
       }
+
       100% {
         width: 0;
         left: 100%;

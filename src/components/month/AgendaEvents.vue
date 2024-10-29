@@ -5,30 +5,20 @@
         {{ day.dayName }}
       </div>
       <div class="agenda__header-date">
-<!--        Here we want to display leading zero for days 1-9, in order to prevent layout shifts-->
+        <!--        Here we want to display leading zero for days 1-9, in order to prevent layout shifts-->
         {{ day.dateTimeString.substring(8, 10) }}
       </div>
     </header>
     <div class="agenda__content">
-      <div
-        v-if="day.events.length === 0"
-        class="is-empty"
-      >
+      <div v-if="day.events.length === 0" class="is-empty">
         {{ getLanguage(languageKeys['noEvent'], time.CALENDAR_LOCALE) }}
       </div>
-      <div
-        v-else
-        class="agenda__content-events-list"
-      >
-        <AgendaEventTile
-          v-for="dayEvent of day.events"
-          :key="`agenda_event_` + dayEvent.id"
-          :day="day"
-          :config="config"
-          :calendar-event="dayEvent"
-          :time="time"
-          @event-was-clicked="$emit('event-was-clicked', $event)"
-        />
+      <div v-else class="agenda__content-events-list">
+        <slot name="agendaEvents" :events="day.events">
+          <AgendaEventTile v-for="dayEvent of day.events" :key="`agenda_event_` + dayEvent.id" :day="day"
+            :config="config" :calendar-event="dayEvent" :time="time"
+            @event-was-clicked="$emit('event-was-clicked', $event)" />
+        </slot>
       </div>
     </div>
   </div>
@@ -73,7 +63,6 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-
 .agenda__wrapper {
   display: flex;
   flex-flow: row;
