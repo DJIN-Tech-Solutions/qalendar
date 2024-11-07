@@ -1,3 +1,6 @@
+# DJIN Qalendar
+Migrating to composition API TS for better control over the apps while fixing some bugs in the process.
+
 ![qalendar](https://discover-test-files.s3.eu-central-1.amazonaws.com/Logo+MAIN.png)
 
 [![Build](https://github.com/tomosterlund/qalendar/actions/workflows/build.yml/badge.svg)](https://github.com/tomosterlund/qalendar/actions/workflows/build.yml)

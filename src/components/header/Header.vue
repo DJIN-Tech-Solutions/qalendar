@@ -1,69 +1,50 @@
 <template>
   <div class="calendar-header">
-    <div
-      v-if="periodName"
-      class="calendar-header__period-name"
-    >
-      {{ periodName }}
-    </div>
+    <slot name="header" :period-name="periodName" :mode-name="modeName" :mode-options="modeOptions"
+      :go-to-period="goToPeriod" :handlePeriodChange="handlePeriodChange"
+      :showModePicker="(show: boolean) => showModePicker = show">
+      <slot name="header-start" />
 
-    <div class="calendar-header__period">
-      <div class="calendar-header__chevron-arrows">
-        <FontAwesomeIcon
-          class="calendar-header__chevron-arrow calendar-header__chevron-arrow-left"
-          :icon="icons.chevronLeft"
-          @click="goToPeriod('previous')"
-        />
-
-        <FontAwesomeIcon
-          class="calendar-header__chevron-arrow calendar-header__chevron-arrow-right"
-          :icon="icons.chevronRight"
-          @click="goToPeriod('next')"
-        />
+      <div v-if="periodName" class="calendar-header__period-name">
+        {{ periodName }}
       </div>
 
-      <DatePicker
-        ref="periodSelect"
-        :mode="mode"
-        :time-prop="time"
-        :period-prop="period"
-        @updated="handlePeriodChange"
-      />
+      <slot name="header-center" />
+      
+      <div class="calendar-header__period">
 
-      <div
-        v-if="!onlyDayModeIsEnabled"
-        class="calendar-header__mode-picker"
-      >
-        <div
-          class="calendar-header__mode-value"
-          @click="showModePicker = true"
-        >
-          {{ modeName }}
+        <div class="calendar-header__chevron-arrows">
+          <FontAwesomeIcon class="calendar-header__chevron-arrow calendar-header__chevron-arrow-left"
+            :icon="icons.chevronLeft" @click="goToPeriod('previous')" />
+
+          <FontAwesomeIcon class="calendar-header__chevron-arrow calendar-header__chevron-arrow-right"
+            :icon="icons.chevronRight" @click="goToPeriod('next')" />
         </div>
 
-        <div
-          v-if="showModePicker"
-          class="calendar-header__mode-options"
-          @mouseleave="showModePicker = false"
-        >
-          <template
-            v-for="calendarMode in modeOptions"
-            :key="calendarMode"
-          >
-            <div
-              v-if="
+
+        <DatePicker ref="periodSelect" :mode="mode" :time-prop="time" :period-prop="period"
+          @updated="handlePeriodChange" />
+
+        <div v-if="!onlyDayModeIsEnabled" class="calendar-header__mode-picker">
+          <div class="calendar-header__mode-value" @click="showModePicker = true">
+            {{ modeName }}
+          </div>
+
+          <div v-if="showModePicker" class="calendar-header__mode-options" @mouseleave="showModePicker = false">
+            <template v-for="calendarMode in modeOptions" :key="calendarMode">
+              <div v-if="
                 !config.disableModes || !config.disableModes.includes(calendarMode)
-              "
-              class="calendar-header__mode-option"
-              :class="'is-' + calendarMode + '-mode'"
-              @click="$emit('change-mode', calendarMode)"
-            >
-              {{ getLanguage(languageKeys[calendarMode], time.CALENDAR_LOCALE) }}
-            </div>
-          </template>
+              " class="calendar-header__mode-option" :class="'is-' + calendarMode + '-mode'"
+                @click="$emit('change-mode', calendarMode)">
+                {{ getLanguage(languageKeys[calendarMode], time.CALENDAR_LOCALE) }}
+              </div>
+            </template>
+          </div>
         </div>
       </div>
-    </div>
+
+      <slot name="header-end" />
+    </slot>
   </div>
 </template>
 
@@ -310,4 +291,5 @@ export default defineComponent({
     }
   }
 }
-</style>
+
+</>
