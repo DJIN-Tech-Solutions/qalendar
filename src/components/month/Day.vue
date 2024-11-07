@@ -26,7 +26,7 @@
         {{ day.dateTimeString.substring(8, 10).startsWith('0') ? day.dateTimeString.substring(9, 10) : day.dateTimeString.substring(8, 10) }}
       </span>
 
-      <div class="calendar-month_events">
+      <div class="calendar-month_events" @click="emitDayWasClicked">
         <template
           v-for="(calendarEvent, index) in day.events"
           :key="index"
