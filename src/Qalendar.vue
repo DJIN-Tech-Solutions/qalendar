@@ -11,7 +11,25 @@
       </Transition>
 
       <AppHeader ref="appHeader" :key="wasInitialized + mode" :config="config" :mode="mode" :time="time"
-        :period="period" :is-small="isSmall" @change-mode="handleChangeMode" @updated-period="handleUpdatedPeriod" />
+        :period="period" :is-small="isSmall" @change-mode="handleChangeMode" @updated-period="handleUpdatedPeriod">
+        <template #header="{ periodName, modeName, modeOptions, goToPeriod, handlePeriodChange, showModePicker }">
+          <slot name="header" :period-name="periodName" :mode-name="modeName" :mode-options="modeOptions"
+            :go-to-period="goToPeriod" :handle-period-change="handlePeriodChange" :show-mode-picker="showModePicker">
+          </slot>
+        </template>
+
+        <template #header-start>
+          <slot name="header-start"></slot>
+        </template>
+
+        <template #header-center>
+          <slot name="header-center"></slot>
+        </template>
+
+        <template #header-end>
+          <slot name="header-end"></slot>
+        </template>
+      </AppHeader>
 
       <Week v-if="['week', 'day'].includes(mode)"
         :key="period.start.getTime() + period.end.getTime() + eventRenderingKey" :events-prop="eventsDataProperty"
