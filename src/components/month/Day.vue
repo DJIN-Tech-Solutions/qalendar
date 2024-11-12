@@ -18,6 +18,7 @@
     <slot
       name="dayCell"
       :day-data="day"
+      :selectDay="emitDayWasClicked"
     >
       <span
         class="calendar-month__day-date"

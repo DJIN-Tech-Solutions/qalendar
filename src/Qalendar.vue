@@ -71,8 +71,8 @@
           <slot :event-data="p.eventData" name="monthEvent" />
         </template>
 
-        <template #dayCell="{ dayData }">
-          <slot :day-data="dayData" name="dayCell" />
+        <template #dayCell="{ dayData, selectDay }">
+          <slot :day-data="dayData" :selectDay="selectDay" name="dayCell" />
         </template>
       </Month>
     </div>
