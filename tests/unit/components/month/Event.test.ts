@@ -7,7 +7,7 @@ import unidecode from 'unidecode';
 import {dataRefFrom} from "../../../vitest-setup";
 import {EventBuilder} from "../../../../src/models/Event";
 import {modeType} from "../../../../src/typings/types";
-import {eventInterface} from "../../../../src/typings/interfaces/event.interface";
+import type {eventInterface} from "../../../../src/typings/interfaces/event.interface";
 import {EVENT_COLORS} from "../../../../src/constants";
 
 const EVENT_TIME = ".calendar-month__event-time";

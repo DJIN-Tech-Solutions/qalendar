@@ -13,7 +13,7 @@
 <script lang="ts">
 import {defineComponent} from "vue";
 import Qalendar from '../../src/Qalendar.vue';
-import {configInterface} from '../../src/typings/config.interface';
+import type {configInterface} from '../../src/typings/config.interface';
 import {dragAndDropEvents} from './__data__/03-drag-and-drop-events';
 import {WEEK_START_DAY} from "../../src/helpers/Time";
 

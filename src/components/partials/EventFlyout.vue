@@ -182,6 +182,8 @@ export default defineComponent({
       if (!this.calendarEvent || !this.calendarEvent.time) return null;
 
       const eventType = Helpers.getEventType(this.calendarEvent, this.time);
+      
+      if(!eventType) return null;
 
       if ([EVENT_TYPE.MULTI_DAY_TIMED].includes(eventType)) {
         const startLocalizedString = this.getDateFromDateString(

@@ -46,7 +46,7 @@ export default class Helpers {
 
     if (isFullDayEvent) return this.getFullDayEventType(event, time)
 
-    throw new Error('Event has invalid type');
+    console.warn('Event has invalid type', event);
   }
 
   static getTimedEventType(event: eventInterface, time: Time) {

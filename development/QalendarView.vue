@@ -1,65 +1,57 @@
 <template>
-  <div
-    class="app-container"
-    :class="'layout-has-' + layout"
-  >
+  <div class="app-container" :class="'layout-has-' + layout">
     <DevSidebar v-if="layout === 'sidebar'" />
 
     <DevHeader v-if="layout === 'header'" />
 
+    <DevBigHeader v-if="layout === 'big-header'" />
+
     <main class="is-light-mode">
-      <Qalendar
-        :key="config.locale + config.week.nDays"
-        :selected-date="new Date()"
-        :config="config"
-        :events="events"
-        :is-loading="isLoading"
-        @event-was-clicked="reactToEvent"
-        @updated-period="updatedPeriod"
-        @updated-mode="updatedPeriod"
-        @event-was-resized="reactToEvent"
-        @edit-event="editEvent"
-        @delete-event="deleteEvent"
-        @day-was-clicked="reactToEvent"
-        @date-was-clicked="reactToEvent"
-        @datetime-was-clicked="reactToEvent"
-        @event-was-dragged="handleEventWasDragged"
-        @interval-was-clicked="handleIntervalWasClicked"
-      >
-        <template #monthEvent="{eventData}">
+      <Qalendar :key="config.locale + config.week.nDays" :selected-date="new Date()" :config="config" :events="events"
+        :is-loading="isLoading" @event-was-clicked="reactToEvent" @updated-period="updatedPeriod"
+        @updated-mode="updatedPeriod" @event-was-resized="reactToEvent" @edit-event="editEvent"
+        @delete-event="deleteEvent" @day-was-clicked="reactToEvent" @date-was-clicked="reactToEvent"
+        @datetime-was-clicked="reactToEvent" @event-was-dragged="handleEventWasDragged"
+        @interval-was-clicked="handleIntervalWasClicked">
+        <template #calendarFooter>
+          <div style="display: flex; width: 95%; flex-direction: column; padding: 2px">
+            <div>Subtitle:</div>
+            <div style="display: flex; justify-content: space-around; margin: 2px; width: 100%;">
+              <div v-for="item, i in ['😊:open', '😇:free', '👺:full', '☎️:phone only']" :key="i">
+                {{ item }}
+              </div>
+            </div>
+          </div>
+        </template>
+
+        <template #monthEvent="{ eventData }">
           {{ eventData.title }}
         </template>
         <template #customCurrentTime>
-          <div
-            :style="{
-              height: '3px',
+          <div :style="{
+            height: '3px',
+            backgroundColor: 'cornflowerblue',
+            position: 'relative',
+          }">
+            <div :style="{
+              position: 'absolute',
+              left: '-7px',
+              top: '-6px',
+              height: '15px',
+              width: '15px',
               backgroundColor: 'cornflowerblue',
-              position: 'relative',
-            }"
-          >
-            <div
-              :style="{
-                position: 'absolute',
-                left: '-7px',
-                top: '-6px',
-                height: '15px',
-                width: '15px',
-                backgroundColor: 'cornflowerblue',
-                borderRadius: '50%',
-              }"
-            />
+              borderRadius: '50%',
+            }" />
           </div>
         </template>
 
         <template #weekDayEvent="eventProps">
-          <div :style="{ backgroundColor: 'cornflowerblue', color: '#fff', width: '100%', height: '100%', overflow: 'hidden' }">
+          <div
+            :style="{ backgroundColor: 'cornflowerblue', color: '#fff', width: '100%', height: '100%', overflow: 'hidden' }">
             {{ eventProps.eventData.title }}
 
             <div>
-              <input
-                id="checkox-select-time"
-                type="checkbox"
-              >
+              <input id="checkox-select-time" type="checkbox">
 
               <label for="checkox-select-time">
                 Select time slot
@@ -69,19 +61,13 @@
         </template>
 
         <template #eventDialog="props">
-          <div
-            v-if="props.eventDialogData && props.eventDialogData.title"
-            :style="{ padding: '16px' }"
-          >
+          <div v-if="props.eventDialogData && props.eventDialogData.title" :style="{ padding: '16px' }">
             <div :style="{ marginBottom: '8px' }">
               Edit event
             </div>
 
-            <input
-              v-model="eventDialogForm.title"
-              type="text"
-              :style="{ width: '90%', padding: '8px', marginBottom: '8px' }"
-            >
+            <input v-model="eventDialogForm.title" type="text"
+              :style="{ width: '90%', padding: '8px', marginBottom: '8px' }">
 
             <button @click="props.closeEventDialog">
               Finished!
@@ -89,32 +75,30 @@
           </div>
         </template>
 
-<!--        <template #dayCell="{dayData}">-->
-<!--          <div>-->
-<!--            <div> {{ dayData.dateTimeString.substring(8, 10) }}</div>-->
-<!--            <div> {{ dayData.events.length }} events</div>-->
-<!--          </div>-->
-<!--        </template>-->
+        <!--        <template #dayCell="{dayData}">-->
+        <!--          <div>-->
+        <!--            <div> {{ dayData.dateTimeString.substring(8, 10) }}</div>-->
+        <!--            <div> {{ dayData.events.length }} events</div>-->
+        <!--          </div>-->
+        <!--        </template>-->
       </Qalendar>
     </main>
 
-    <DevToolbar
-      @selected-locale="config.locale = $event"
-      @selected-layout="layout = $event"
-      @selected-n-days="config.week!.nDays = $event"
-    />
+    <DevToolbar @selected-locale="config.locale = $event" @selected-layout="layout = $event"
+      @selected-n-days="config.week!.nDays = $event" />
   </div>
 </template>
 
 <script lang="ts">
 import Qalendar from '../src/Qalendar.vue';
 import { defineComponent } from 'vue';
-import { configInterface } from '../src/typings/config.interface';
-import { eventInterface } from '../src/typings/interfaces/event.interface';
+import type { configInterface } from '../src/typings/config.interface';
+import type { eventInterface } from '../src/typings/interfaces/event.interface';
 import { seededEvents } from './data/seeded-events';
 import DevToolbar from './components/DevToolbar.vue';
 import DevSidebar from './components/DevSidebar.vue';
 import DevHeader from './components/DevHeader.vue';
+import DevBigHeader from './components/DevBigHeader.vue';
 import { WEEK_START_DAY } from "../src/helpers/Time";
 
 export default defineComponent({
@@ -124,6 +108,7 @@ export default defineComponent({
     DevHeader,
     DevSidebar,
     DevToolbar,
+    DevBigHeader,
     Qalendar,
   },
 
@@ -258,6 +243,13 @@ body {
 }
 
 .layout-has-header {
+  main {
+    display: flex;
+    justify-content: center;
+  }
+}
+
+.layout-has-big-header {
   main {
     display: flex;
     justify-content: center;

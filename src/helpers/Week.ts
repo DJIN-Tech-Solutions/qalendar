@@ -25,6 +25,7 @@ export class WeekHelper {
 
     for (const scheduleEvent of events) {
       const eventType = Helpers.getEventType(scheduleEvent, time);
+      if(!eventType) continue;
       if ([EVENT_TYPE.SINGLE_DAY_TIMED, EVENT_TYPE.SINGLE_HYBRID_DAY_TIMED].includes(eventType)) {
         singleDayTimedEvents.push(scheduleEvent);
       } else {

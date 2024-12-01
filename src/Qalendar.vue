@@ -56,9 +56,14 @@
       <Month v-if="mode === 'month'" :key="period.start.getTime() + period.end.getTime() + eventRenderingKey"
         :events-prop="eventsDataProperty" :time="time" :config="enhancedConfig" :period="period"
         :hide-agenda="hideAgenda" @event-was-clicked="$emit('event-was-clicked', $event)"
+        :auto-scroll-on-day-click="autoScrollOnDayClick"
         @date-was-clicked="handleDateWasClicked" @event-was-dragged="handleEventWasUpdated($event, 'dragged')"
         @updated-period="handleUpdatedPeriod($event, true)" @edit-event="$emit('edit-event', $event)"
         @delete-event="$emit('delete-event', $event)">
+        <template #calendarFooter>
+          <slot name="calendarFooter"></slot>
+        </template>
+        
         <template #agendaEvents="{ events }">
           <slot name="agendaEvents" :events="events" />
         </template>
@@ -120,6 +125,10 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
+    autoScrollOnDayClick: {
+      type: Boolean,
+      default: true,
+    }
   },
 
   emits: [

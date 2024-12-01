@@ -8,7 +8,7 @@
       <div v-for="(week, weekIndex) in month" :key="weekIndex" class="calendar-month__week">
         <Day v-for="(day, dayIndex) in week" :key="dayIndex" :config="config" :day="day" :time="time"
           :is-selected="selectedDay?.dateTimeString === day.dateTimeString" @event-was-clicked="handleClickOnEvent"
-          @event-was-dragged="handleEventWasDragged" @date-was-clicked="$emit('date-was-clicked', $event)"
+          @event-was-dragged="handleEventWasDragged" @date-was-clicked="handleDateWasClicked"
           @day-was-selected="selectedDay = $event" @updated-period="$emit('updated-period', $event)">
           <template #monthEvent="{ eventData }">
             <slot :event-data="eventData" name="monthEvent" />
@@ -20,9 +20,12 @@
         </Day>
       </div>
     </div>
+    <div class="calendar-month__week-day-names">
+      <slot name="calendarFooter"></slot>
+    </div>
 
     <div v-if="!(config.month?.showEventsOnMobileView === false)" class="calendar-month__day_events">
-      <AgendaEvents v-if="selectedDay && !$props.hideAgenda" :config="config" :time="time" :day="selectedDay"
+      <AgendaEvents id="agendaEvents" v-if="selectedDay && !$props.hideAgenda" :config="config" :time="time" :day="selectedDay"
         @event-was-clicked="handleClickOnEvent">
         <template #agendaEvents="{ events }">
           <slot name="agendaEvents" :events="events" />
@@ -89,6 +92,10 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
+    autoScrollOnDayClick: {
+      type: Boolean,
+      default: true,
+    }
   },
 
   emits: [
@@ -109,15 +116,26 @@ export default defineComponent({
       fullDayEvents: [] as eventInterface[],
       scrollbar: null as null | PerfectScrollbar,
       selectedDay: null as dayInterface | null,
+      shouldScrollOnDayClick: true,
     };
   },
 
   mounted() {
     this.initMonth();
     this.initScrollbar();
+    this.watchScrolling();
   },
 
   methods: {
+    watchScrolling() {
+      if(!this.autoScrollOnDayClick) return;
+      window.addEventListener('scroll', () => {
+        this.shouldScrollOnDayClick = true;
+      });
+      window.addEventListener('touchmove', () => {
+        this.shouldScrollOnDayClick = true;
+      })
+    },
     initScrollbar(elapsedMs = 0) {
       const el = document.querySelector('.calendar-month');
       if (elapsedMs > 3000) return;
@@ -171,9 +189,10 @@ export default defineComponent({
       const fullDayEvents = [];
 
       for (const calendarEvent of this.events) {
-        if (Helpers.getEventType(calendarEvent, this.time) === EVENT_TYPE.SINGLE_DAY_TIMED)
+        if (Helpers.getEventType(calendarEvent, this.time) === EVENT_TYPE.SINGLE_DAY_TIMED) {
           timedEvents.push(calendarEvent);
-        else {
+        }
+        if (Helpers.getEventType(calendarEvent, this.time) === EVENT_TYPE.SINGLE_DAY_FULL_DAY) {
           fullDayEvents.push(calendarEvent);
         }
       }
@@ -203,6 +222,15 @@ export default defineComponent({
       this.events = newEvents;
       this.initMonth();
     },
+
+    handleDateWasClicked(event:any) {
+      this.$emit('date-was-clicked', event);
+      if(this.$props.autoScrollOnDayClick && this.shouldScrollOnDayClick) {
+        document.getElementById('agendaEvents')?.scrollIntoView({ behavior: 'smooth' });
+        this.shouldScrollOnDayClick = false;
+      }
+    },
+
 
     setInitialSelectedDay() {
       const selectedDayDateString = this.time.getDateStringFromDate(this.period.selectedDate);

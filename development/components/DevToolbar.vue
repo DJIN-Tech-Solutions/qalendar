@@ -7,6 +7,7 @@
         <option value="none">No layout</option>
         <option value="sidebar">Sidebar</option>
         <option value="header">Header</option>
+        <option value="big-header">Big Header</option>
       </select>
 
       <select id="locale" v-model="locale" name="locale">
